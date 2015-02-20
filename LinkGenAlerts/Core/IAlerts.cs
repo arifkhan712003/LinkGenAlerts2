@@ -10,6 +10,6 @@ namespace LinkGenAlerts.Core
 
         void AccumulateData(IList<DownloadsData> attributeData);
 
-        void RaiseAlerts();
+        void RaiseAlerts(DateTime alertsTime);
     }
 }

@@ -30,14 +30,20 @@ namespace LinkGenAlerts.Core
             throw new NotImplementedException();
         }
 
-        public virtual void RaiseAlerts()
+        public virtual void RaiseAlerts(DateTime alertsTime)
         {
-            throw new NotImplementedException();
+            // Get Alerts
+            IList<AlertData> alertData = this.GetAlerts(alertsTime);
+            
+            // Write Alerts into database
+            this.WarehouseRepository.WriteAlerts(alertData);
         }
 
-        private List<AlertData> GetAlerts()
+        private IList<AlertData> GetAlerts(DateTime alertsTime)
         {
-            throw new NotImplementedException();
+            IList<AlertData> alertData = new List<AlertData>();
+            alertData = this.WarehouseRepository.GetAlerts(alertsTime);
+            return alertData;
         }
     }
 }

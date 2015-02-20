@@ -24,7 +24,6 @@ namespace LinkGenAlerts
             DateTime endDt = startDt.AddMinutes(60);
 
             IAlerts linkGenAlerts = new CdnAlerts(new AzureRepository());
-
             IAlertsFacade alertsFacade = new AlertsFacade(linkGenAlerts, startDt, endDt);
             alertsFacade.Execute();
 

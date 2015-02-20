@@ -42,12 +42,14 @@ namespace LinkGenAlerts.Repository
 
             return cdnRawDatas;
         }
+        private CloudTable GetCloudTable(string tableName)
+        {
+            return GetCloudTableClient().GetTableReference(tableName);
+        }
 
         private CloudTableClient GetCloudTableClient()
         {
-            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_connectionString);
-
-            return storageAccount.CreateCloudTableClient();
+            return CloudStorageAccount.Parse(_connectionString).CreateCloudTableClient();
         }
 
 
@@ -85,8 +87,7 @@ namespace LinkGenAlerts.Repository
 
         public void InsertAlerts(IList<DownloadsData> attributeData)
         {
-            CloudTableClient tableClient = GetCloudTableClient();
-            CloudTable table = tableClient.GetTableReference("DownloadsData");
+            CloudTable table = GetCloudTable("DownloadsData");
             table.CreateIfNotExists();
 
             foreach (var downloadsData in attributeData)
@@ -94,6 +95,42 @@ namespace LinkGenAlerts.Repository
                 TableOperation operation = TableOperation.Insert(downloadsData);
                 table.Execute(operation);
             }
+        }
+
+
+        public List<DownloadsThresholdConfig> FetchThreshold()
+        {
+            CloudTable table = GetCloudTable("DownloadsThresholdConfig");
+
+            TableQuery<DownloadsThresholdConfig> tableQuery = new TableQuery<DownloadsThresholdConfig>();
+
+            return table.ExecuteQuery(tableQuery).ToList();
+        }
+
+        public List<AlertAttribute> FetchAlertAttributes()
+        {
+            var table = GetCloudTable("AlertAttribute");
+
+            TableQuery<AlertAttribute> query = new TableQuery<AlertAttribute>();
+
+            return table.ExecuteQuery(query).ToList();
+        }
+
+        public List<DownloadsData> FetchDownloadsData(DateTime dateTime)
+        {
+            CloudTableClient tableClient = GetCloudTableClient();
+            CloudTable table = tableClient.GetTableReference("DownloadsData");
+
+            dateTime = DateTime.SpecifyKind(dateTime, DateTimeKind.Utc);
+
+            string partitionKeyFilter1 = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, dateTime.ToString("yyyyMMdd"));
+            string partitionKeyFilter2 = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, dateTime.AddDays(-1).ToString("yyyyMMdd"));
+            string partitionKeyFilter = TableQuery.CombineFilters(partitionKeyFilter1, TableOperators.Or, partitionKeyFilter2);
+            string whereFlter = TableQuery.CombineFilters(partitionKeyFilter, TableOperators.And, TableQuery.GenerateFilterConditionForDate("FromTime", QueryComparisons.GreaterThanOrEqual, dateTime));
+
+            TableQuery<DownloadsData> tableQuery = new TableQuery<DownloadsData>().Where(whereFlter);
+
+            return table.ExecuteQuery(tableQuery).ToList();
         }
     }
 }

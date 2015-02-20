@@ -22,15 +22,11 @@ namespace LinkGenAlerts.Core
 
         public void Execute()
         {
-            var data = _alerts.FetchData(_startDt, _endDt);
+            //var data = _alerts.FetchData(_startDt, _endDt);
 
-            foreach (var downloadsData in data)
-            {
-                Console.WriteLine(downloadsData.SubscriberId+" "+ downloadsData.Value +" "+ downloadsData.FromTime);
-            }
-            
-            _alerts.AccumulateData(data);
-            //this._alerts.RaiseAlerts();
+            //_alerts.AccumulateData(data);
+
+            _alerts.RaiseAlerts(_startDt);
         }
     }
 }

@@ -67,9 +67,11 @@
     <Compile Include="Core\CdnAlerts.cs" />
     <Compile Include="Core\IAlerts.cs" />
     <Compile Include="Core\IAlertsFacade.cs" />
+    <Compile Include="Model\AlertAttribute.cs" />
     <Compile Include="Model\AlertData.cs" />
     <Compile Include="Model\CdnRawData.cs" />
     <Compile Include="Model\DownloadsData.cs" />
+    <Compile Include="Model\DownloadsThresholdConfig.cs" />
     <Compile Include="Model\IsapiDownloads.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
