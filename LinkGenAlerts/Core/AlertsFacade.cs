@@ -22,11 +22,21 @@ namespace LinkGenAlerts.Core
 
         public void Execute()
         {
-            //var data = _alerts.FetchData(_startDt, _endDt);
+            try
+            {
+                //var data = _alerts.FetchData(_startDt, _endDt);
 
-            //_alerts.AccumulateData(data);
+                //_alerts.AccumulateData(data);
 
-            _alerts.RaiseAlerts(_startDt);
+                _alerts.RaiseAlerts(_startDt);
+
+                Console.WriteLine("---------End----------");
+
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine( exception);
+            }
         }
     }
 }

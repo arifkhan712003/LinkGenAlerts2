@@ -85,17 +85,6 @@ namespace LinkGenAlerts.Repository
             return filterCondition;
         }
 
-        public void InsertAlerts(IList<DownloadsData> attributeData)
-        {
-            CloudTable table = GetCloudTable("DownloadsData");
-            table.CreateIfNotExists();
-
-            foreach (var downloadsData in attributeData)
-            {
-                TableOperation operation = TableOperation.Insert(downloadsData);
-                table.Execute(operation);
-            }
-        }
 
 
         public List<DownloadsThresholdConfig> FetchThreshold()
@@ -114,6 +103,30 @@ namespace LinkGenAlerts.Repository
             TableQuery<AlertAttribute> query = new TableQuery<AlertAttribute>();
 
             return table.ExecuteQuery(query).ToList();
+        }
+
+        public void InsertDownloadsData(IList<DownloadsData> downloadsDatas)
+        {
+            CloudTable table = GetCloudTable("DownloadsData");
+            table.CreateIfNotExists();
+
+            foreach (var downloadsData in downloadsDatas)
+            {
+                TableOperation operation = TableOperation.Insert(downloadsData);
+                table.Execute(operation);
+            }
+        }
+
+        public void InsertAlerts(List<AlertData> alertDatas)
+        {
+            CloudTable table = GetCloudTable("AlertData");
+            table.CreateIfNotExists();
+
+            foreach (var alertData in alertDatas)
+            {
+                TableOperation operation = TableOperation.Insert(alertData);
+                table.Execute(operation);
+            }
         }
 
         public List<DownloadsData> FetchDownloadsData(DateTime dateTime)

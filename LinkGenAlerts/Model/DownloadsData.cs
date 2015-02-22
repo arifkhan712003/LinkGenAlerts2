@@ -5,16 +5,6 @@ namespace LinkGenAlerts.Model
 {
     public class DownloadsData :TableEntity
     {
-        //public DownloadsData()
-        //{
-
-        //}
-
-        //public DownloadsData(string partitionKey, string rowKey)
-        //    : base(partitionKey, rowKey)
-        //{
-        //}
-
         public string SubscriberId { get; set; }
         public string AlertAttributeId { get; set; }
 

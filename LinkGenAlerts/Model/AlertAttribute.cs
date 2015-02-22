@@ -9,11 +9,14 @@ namespace LinkGenAlerts.Model
 {
     public class AlertAttribute : TableEntity
     {
-        public AlertAttribute()
+        public string Id
         {
-            Id = RowKey;
+            get
+            {
+                return RowKey;
+            }
         }
-        public string Id { get; set; }
+
         public string Name { get; set; }
         public string Description { get; set; }
     }

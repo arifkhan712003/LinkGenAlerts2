@@ -1,9 +1,16 @@
 ﻿using System;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace LinkGenAlerts.Model
 {
-    public class AlertData
+    public class AlertData : TableEntity
     {
+        public AlertData()
+        {
+            PartitionKey = DateTime.Now.ToString("yyyyMMdd");
+            RowKey = Guid.NewGuid().ToString();
+        }
+
         public string SubscriberCode { get; set; }
 
         public string AttributeName { get; set; }

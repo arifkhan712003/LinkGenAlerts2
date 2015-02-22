@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using LinkGenAlerts.Model;
 using LinkGenAlerts.Repository;
 using LinkGenAlerts.Utillities;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace LinkGenAlerts.Core
 {
@@ -12,7 +14,8 @@ namespace LinkGenAlerts.Core
     {
         private readonly IAzureRepository _azureRepository;
 
-        public CdnAlerts(IAzureRepository azureRepository) : base(azureRepository)
+        public CdnAlerts(IAzureRepository azureRepository)
+            : base(azureRepository)
         {
             _azureRepository = azureRepository;
         }
@@ -46,7 +49,7 @@ namespace LinkGenAlerts.Core
 
         public override void AccumulateData(IList<DownloadsData> attributeData)
         {
-            _azureRepository.InsertAlerts(attributeData);
+            _azureRepository.InsertDownloadsData(attributeData);
         }
 
         public override void RaiseAlerts(DateTime dateTime)
@@ -55,27 +58,50 @@ namespace LinkGenAlerts.Core
 
             List<DownloadsData> downloadsDatas = _azureRepository.FetchDownloadsData(dateTime);
 
-            List<AlertAttribute> alertAttributes = _azureRepository.FetchAlertAttributes();
+            var alertDatas = from downloadsData in downloadsDatas
+                             group downloadsData by new { downloadsData.SubscriberId, downloadsData.AlertAttributeId }
+                                 into downloadGroup
+                                 select
+                                     new AlertData()
+                                     {
+                                         SubscriberCode = downloadGroup.Key.SubscriberId,
+                                         AttributeName = downloadGroup.Key.AlertAttributeId,
+                                         AttributeValue = downloadGroup.Sum(x => x.Value)
+                                     };
 
-            var obj1 = from downloadsData in downloadsDatas
-                group downloadsData by new {downloadsData.SubscriberId, downloadsData.AlertAttributeId}
-                into downloadGroup
-                join alertAttribute in alertAttributes
-                    on downloadGroup.Key.AlertAttributeId equals alertAttribute.Id
-                select
-                    new AlertData()
-                    {
-                        SubscriberCode = downloadGroup.Key.SubscriberId,
-                        AttributeName = alertAttribute.Name,
-                        AttributeValue = downloadGroup.Sum(x => x.Value)
-                    };
+            List<AlertData> returnAlertDatas = new List<AlertData>();
 
-
-            foreach (var alertData in obj1)
+            foreach (var alertData in alertDatas)
             {
-                Console.WriteLine(alertData.SubscriberCode +" "+ alertData.AttributeName +" "+ alertData.AttributeValue);
-            }           
+                var obj = (from threshold in thresholdConfigs
+                    where (threshold.SubscriberCode == alertData.SubscriberCode) &&
+                          (threshold.AlertAttributeId == alertData.AttributeName) &&
+                          (threshold.ThresholdValue <= alertData.AttributeValue)
+                    orderby threshold.ThresholdValue descending
+                    select
+                        new AlertData()
+                        {
+                            SubscriberCode = threshold.SubscriberCode,
+                            AttributeName = threshold.AlertAttributeId,
+                            AttributeValue = alertData.AttributeValue,
+                            ThresholdValue = threshold.ThresholdValue,
+                            StartTime = dateTime,
+                            EndTime = dateTime,
+                            CreatedOn = DateTime.Now
 
+                        }).ToList().Take(1);
+
+                returnAlertDatas.AddRange(obj);
+
+                Console.WriteLine(alertData.SubscriberCode + " " + alertData.AttributeName + " " + alertData.AttributeValue);
+            }
+
+            foreach (var returnAlertData in returnAlertDatas)
+            {
+                Console.WriteLine(">>>"+ returnAlertData.SubscriberCode +" "+ returnAlertData.AttributeValue);
+            }
+
+            _azureRepository.InsertAlerts(returnAlertDatas);
         }
     }
 }

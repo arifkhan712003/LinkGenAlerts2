@@ -10,7 +10,7 @@ namespace LinkGenAlerts.Model
     public class DownloadsThresholdConfig : TableEntity
     {
         public string SubscriberCode { get; set; }
-        public int AlertAttributeId { get; set; }
+        public string AlertAttributeId { get; set; }
         public int TriggerDurationInHours { get; set; }
         public int ThresholdValue { get; set; }
         public string AlertType { get; set; }

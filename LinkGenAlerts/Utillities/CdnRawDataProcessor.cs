@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using LinkGenAlerts.Core;
 using LinkGenAlerts.Model;
 
 namespace LinkGenAlerts.Utillities
@@ -15,12 +17,14 @@ namespace LinkGenAlerts.Utillities
 
         private List<DownloadsData> GetFileCountAttribute(IList<CdnRawData> cdnRawDatas)
         {
+
             return (from rawData in cdnRawDatas
                 group rawData by rawData.ClientInformation_Name
                 into groupedRawData
                         select new DownloadsData
                 {
                     SubscriberId = groupedRawData.Key,
+                    AlertAttributeId = AlertAttributeTypes.DownloadsCount,
                     Value = groupedRawData.Count()
                 }).ToList();
         }
