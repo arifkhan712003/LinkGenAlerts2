@@ -25,5 +25,6 @@ namespace LinkGenAlerts.Model
 
         public DateTime CreatedOn { get; set; }
 
+        public string AlertType { get; set; }
     }
 }

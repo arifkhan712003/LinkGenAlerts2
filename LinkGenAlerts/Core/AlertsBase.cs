@@ -25,7 +25,7 @@ namespace LinkGenAlerts.Core
 
         public abstract IList<DownloadsData> FetchData(DateTime downloadsFromTime, DateTime downloadsToTime);
 
-        public virtual void AccumulateData(IList<DownloadsData> attributeData)
+        public virtual void AccumulateData(IList<DownloadsData> downloadsDatas)
         {
             throw new NotImplementedException();
         }

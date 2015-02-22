@@ -24,11 +24,9 @@ namespace LinkGenAlerts.Core
 
         public override IList<DownloadsData> FetchData(DateTime downloadsFromTime, DateTime downloadsToTime)
         {
-            downloadsFromTime = DateTime.SpecifyKind(downloadsFromTime, DateTimeKind.Utc);
-
             IList<CdnRawData> cdnRawDatas = GetLastUsage(downloadsFromTime, downloadsToTime);
 
-            var cdnProcessedData = new CdnRawDataProcessor().GetAttributeData(cdnRawDatas);
+            IList<DownloadsData> cdnProcessedData = new CdnRawDataProcessor().GetDataForAllAttributes(cdnRawDatas);
 
             foreach (var downloadsData in cdnProcessedData)
             {
@@ -39,25 +37,26 @@ namespace LinkGenAlerts.Core
                 downloadsData.LastUpdatedOn = DateTime.UtcNow;
             }
 
-            return cdnProcessedData.ToList();
+            return cdnProcessedData;
         }
 
         private IList<CdnRawData> GetLastUsage(DateTime downloadsFromTime, DateTime downloadsToTime)
         {
-            return _azureRepository.FetchData(downloadsFromTime, downloadsToTime);
+            return _azureRepository.FetchDownloadsData(downloadsFromTime, downloadsToTime);
         }
 
-        public override void AccumulateData(IList<DownloadsData> attributeData)
+        public override void AccumulateData(IList<DownloadsData> downloadsDatas)
         {
-            _azureRepository.InsertDownloadsData(attributeData);
+            _azureRepository.InsertDownloadsData(downloadsDatas);
         }
 
         public override void RaiseAlerts(DateTime dateTime)
         {
             List<DownloadsThresholdConfig> thresholdConfigs = _azureRepository.FetchThreshold();
 
-            List<DownloadsData> downloadsDatas = _azureRepository.FetchDownloadsData(dateTime);
+            IList<AlertData> downloadsDatas = _azureRepository.FetchAlerts(dateTime);
 
+            /*
             var alertDatas = from downloadsData in downloadsDatas
                              group downloadsData by new { downloadsData.SubscriberId, downloadsData.AlertAttributeId }
                                  into downloadGroup
@@ -74,22 +73,22 @@ namespace LinkGenAlerts.Core
             foreach (var alertData in alertDatas)
             {
                 var obj = (from threshold in thresholdConfigs
-                    where (threshold.SubscriberCode == alertData.SubscriberCode) &&
-                          (threshold.AlertAttributeId == alertData.AttributeName) &&
-                          (threshold.ThresholdValue <= alertData.AttributeValue)
-                    orderby threshold.ThresholdValue descending
-                    select
-                        new AlertData()
-                        {
-                            SubscriberCode = threshold.SubscriberCode,
-                            AttributeName = threshold.AlertAttributeId,
-                            AttributeValue = alertData.AttributeValue,
-                            ThresholdValue = threshold.ThresholdValue,
-                            StartTime = dateTime,
-                            EndTime = dateTime,
-                            CreatedOn = DateTime.Now
+                           where (threshold.SubscriberCode == alertData.SubscriberCode) &&
+                                 (threshold.AlertAttributeId == alertData.AttributeName) &&
+                                 (threshold.ThresholdValue <= alertData.AttributeValue)
+                           orderby threshold.ThresholdValue descending
+                           select
+                               new AlertData()
+                               {
+                                   SubscriberCode = threshold.SubscriberCode,
+                                   AttributeName = threshold.AlertAttributeId,
+                                   AttributeValue = alertData.AttributeValue,
+                                   ThresholdValue = threshold.ThresholdValue,
+                                   StartTime = dateTime,
+                                   EndTime = dateTime,
+                                   CreatedOn = DateTime.Now
 
-                        }).ToList().Take(1);
+                               }).ToList().Take(1);
 
                 returnAlertDatas.AddRange(obj);
 
@@ -98,10 +97,11 @@ namespace LinkGenAlerts.Core
 
             foreach (var returnAlertData in returnAlertDatas)
             {
-                Console.WriteLine(">>>"+ returnAlertData.SubscriberCode +" "+ returnAlertData.AttributeValue);
+                Console.WriteLine(">>>" + returnAlertData.SubscriberCode + " " + returnAlertData.AttributeValue);
             }
 
             _azureRepository.InsertAlerts(returnAlertDatas);
+             */ 
         }
     }
 }

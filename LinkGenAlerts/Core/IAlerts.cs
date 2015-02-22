@@ -8,7 +8,7 @@ namespace LinkGenAlerts.Core
     {
         IList<DownloadsData> FetchData(DateTime downloadsFromTime, DateTime downloadsToTime);
 
-        void AccumulateData(IList<DownloadsData> attributeData);
+        void AccumulateData(IList<DownloadsData> downloadsDatas);
 
         void RaiseAlerts(DateTime alertsTime);
     }

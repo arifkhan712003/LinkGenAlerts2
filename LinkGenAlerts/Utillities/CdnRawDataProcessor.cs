@@ -8,14 +8,14 @@ namespace LinkGenAlerts.Utillities
 {
     public class CdnRawDataProcessor
     {
-        public List<DownloadsData> GetAttributeData(IList<CdnRawData> cdnRawDatas)
+        public IList<DownloadsData> GetDataForAllAttributes(IList<CdnRawData> cdnRawDatas)
         {
-            List<DownloadsData> cdnProcessedData = GetFileCountAttribute(cdnRawDatas);
+            IList<DownloadsData> cdnProcessedData = GetFileCountAttribute(cdnRawDatas);
 
             return cdnProcessedData;
         }
 
-        private List<DownloadsData> GetFileCountAttribute(IList<CdnRawData> cdnRawDatas)
+        private IList<DownloadsData> GetFileCountAttribute(IList<CdnRawData> cdnRawDatas)
         {
 
             return (from rawData in cdnRawDatas

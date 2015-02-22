@@ -6,6 +6,7 @@ namespace LinkGenAlerts.Model
     public class DownloadsData :TableEntity
     {
         public string SubscriberId { get; set; }
+
         public string AlertAttributeId { get; set; }
 
         public DateTime FromTime { get; set; }
@@ -15,5 +16,10 @@ namespace LinkGenAlerts.Model
         public int Value { get; set; }
 
         public DateTime LastUpdatedOn { get; set; }
+
+        public override string ToString()
+        {
+            return SubscriberId +" "+ AlertAttributeId+" "+ FromTime+" "+ ToTime+" "+ Value;
+        }
     }
 }

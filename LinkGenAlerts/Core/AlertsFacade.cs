@@ -15,9 +15,9 @@ namespace LinkGenAlerts.Core
 
         public AlertsFacade(IAlerts linkGenAlerts, DateTime startDt, DateTime endDt)
         {
-            this._alerts = linkGenAlerts;
-            this._startDt = startDt;
-            this._endDt = endDt;
+            _alerts = linkGenAlerts;
+            _startDt = DateTime.SpecifyKind(startDt, DateTimeKind.Utc);
+            _endDt = DateTime.SpecifyKind(endDt, DateTimeKind.Utc);
         }
 
         public void Execute()
